@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titulo %} {{ producto.titulo }} {% endblock %}
+{% block contenido %}
+
+    <div class="row pb-3">
+        <div class="col-md-6 col-lg-5">
+            <img id="imgdetalle" class="img-thumbnail" src="{{ producto.imagen.url }}" alt="{{ producto.titulo }}" />
+        </div>
+        <div class="col-md-6 col-lg-7">
+            <h2 class="text-center text-md-left mt-2 mt-md-0">{{ producto.titulo }}</h2>
+            <h5 class="font-weight-normal">Categoría: <a href="{{ producto.categoria.get_absolute_url }}" class="font-italic">{{ producto.categoria }}</a></h5>
+            <p>Descripción: {{ producto.descripcion }}</p>    
+            <div class="d-flex justify-content-between">
+                <p class="my-auto">Precio: ${{ producto.precio }}</p>
+                <a href="{% url 'webapp:agregar-al-carrito' producto.slug %}" class="btn btn-dark">Agregar al carrito</a>
+            </div>
+        </div>
+    </div>
+    
+{% endblock %}

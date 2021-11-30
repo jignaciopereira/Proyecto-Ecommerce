@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block titulo %}Mi carrito{% endblock %}
+{% block contenido %}
+
+    <h1 class="h-title">Mi carrito</h1>
+    {% for item in items %}
+        <div class="card text-center text-sm-left shadow p-2" >
+            <div class="row no-gutters">
+                <div class="col-sm-5 order-2 order-sm-1 text-center my-auto pb-3 pb-sm-0">
+                    <img src="{{ item.producto.imagen.url }}" class="imgcarrito" alt="{{ item.producto.titulo }}">
+                </div>
+                <div class="col-sm-6 order-3 order-sm-2">
+                    <div class="card-body p-0">
+                        <h5 class="card-title">
+                            <a href="{{ item.get_absolute_url }}">{{ item.producto.titulo }}</a>
+                        </h5>
+                        <p class="card-text">Precio: ${{ item.precio_unidad }}</p>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Cantidades">
+                            <a href="{% url 'webapp:restar-cantidad' item.pk %}" class="btn btn-outline-dark">-</a>
+                            <span class="btn btn-dark">{{ item.cantidad }}</span>
+                            <a href="{% url 'webapp:aumentar-cantidad' item.pk %}" class="btn btn-outline-dark">+</a>
+                        </div>
+                        <p class="card-text mt-3">Total: ${{ item.precio_total }}</p>
+                    </div>
+                </div>
+                <div class="col-sm-1 order-1 order-sm-3 text-right">
+                    <form action="{% url 'webapp:eliminar-del-carrito' item.pk %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-dark btn-sm" title="Eliminar"><i class="bi bi-x-lg"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <h6 class="text-center font-weight-normal bg-white rounded-lg border py-3">Aún no agregaste ningún producto.</h6>
+    {% endfor %}
+
+    {% if not items %}
+        <div class="d-flex justify-content-end mt-3 pb-3">
+            <a class="col-sm-8 col-md-6 col-lg-4 btn btn-dark" href="{% url 'webapp:index' %}">Seguir comprando</a>
+        </div>
+    {% else %}
+        <div class="table-responsive-xl d-flex justify-content-end mt-3">
+            <table class="table table-bordered text-center col-sm-8 col-md-6 col-lg-4 shadow">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>
+                            Total
+                        </th>
+                        <td>
+                            ${{ carrito_total }}
+                        </td>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="d-flex justify-content-end pb-3"> 
+            <a class="col-sm-8 col-md-6 col-lg-4 btn btn-dark" href="{% url 'webapp:checkout' %}">Checkout</a>
+        </div>
+        <div class="d-flex justify-content-end pb-3">
+            <form action="{% url 'webapp:vaciar-carrito' %}" method="post" class="col-md-4 col-lg-2 p-0 mr-3">
+                {% csrf_token %}
+                <button type="submit" class="col-12 btn btn-outline-dark">Vaciar carrito</button>
+            </form>
+            <a class="col-sm-8 col-md-6 col-lg-4 btn btn-dark" href="{% url 'webapp:index' %}">Seguir comprando</a>
+        </div>
+    {% endif %}
+
+{% endblock %}

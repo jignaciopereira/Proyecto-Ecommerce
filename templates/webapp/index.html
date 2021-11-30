@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block titulo %}Inicio{% endblock %}
+{% block contenido %}
+
+    <h1 class="h-title">Productos nuevos</h1>
+    <div class="row row-cols-1 row-cols-md-1 row-cols-lg-3">
+        {% for producto in productos|slice:"3" %}
+            <div class="col mb-3">
+                <div class="card my-card h-100 text-center shadow">
+                    <img src="{{ producto.imagen.url }}" class="card-img-top imgportada" alt="{{ producto.titulo }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ producto.titulo }}</h5>
+                        <p class="card-text d-flex justify-content-around">
+                            <span class=" my-auto">${{ producto.precio }}</span>
+                            {% if not user|miembro_grupo:'Empleado' %}
+                                <a href="{% url 'webapp:agregar-al-carrito' producto.slug %}" class="btn btn-dark btn-sm">Agregar al carrito</a>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ producto.get_absolute_url }}" class="btn btn-outline-dark btn-sm">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <h2 class="h-title">Más productos</h2>
+    <div class="row">
+        <div class="owl-carousel">
+            {% for producto in productos|slice:"3:" %}
+                <div class="col pb-3">
+                    <div class="card my-card text-center shadow">
+                        <img src="{{ producto.imagen.url }}" class="card-img-top imgcarousel" alt="{{ producto.titulo }}">
+                        <div class="overlay">
+                            <div class="card-body">
+                                <span class="card-title text">{{ producto.titulo }}</span>
+                            </div>  
+                        </div>  
+                        <div class="card-footer">
+                            <a href="{{ producto.get_absolute_url }}" class="btn btn-outline-dark btn-sm">Ver detalles</a>
+                        </div>      
+                    </div>
+                </div>
+            {% endfor %}  
+        </div>   
+    </div>
+
+{% endblock %}

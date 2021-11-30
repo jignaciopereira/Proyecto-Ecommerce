@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block titulo %}Nuevo producto{% endblock %}
+{% block contenido %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="row">
+            <div class="col-md-6 col-lg-5">
+                <div class="fieldWrapper">
+                    {{ form.imagen.errors }}
+                    <label for="{{ form.imagen.id_for_label }}">Imagen</label>
+                    <img id="imgdetalle" class="img-thumbnail" src="https://via.placeholder.com/445x500" />
+                    {{ form.imagen }}
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-7">
+                <div class="row">
+                    <div class="col">
+                        <div class="fieldWrapper">
+                            {{ form.marca.errors }}
+                            <label for="{{ form.marca.id_for_label }}">Marca</label>
+                            {{ form.marca }}
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="fieldWrapper">
+                            {{ form.modelo.errors }}
+                            <label for="{{ form.modelo.id_for_label }}">Modelo</label>
+                            {{ form.modelo }}
+                        </div>
+                    </div>
+                </div>
+                <div class="fieldWrapper">
+                    {{ form.categoria.errors }}
+                    <label for="{{ form.categoria.id_for_label }}">Categoría</label>
+                    {{ form.categoria }}
+                </div>
+                <div class="fieldWrapper">
+                    {{ form.descripcion.errors }}
+                    <label for="{{ form.descripcion.id_for_label }}">Descripción</label>
+                    {{ form.descripcion }}
+                </div>  
+                <div class="fieldWrapper">
+                    <div class="form-group row mt-3">
+                        <label for="{{ form.precio.id_for_label }}" class="col-sm-1 col-form-label">Precio</label>
+                        <div class="col-sm-4">
+                            {{ form.precio }}            
+                        </div>
+                        <div class="col d-flex justify-content-end">
+                            <input type="submit" value="Crear" class="btn btn-dark">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block titulo %}Mis ordenes{% endblock %}
+{% block contenido %}
+
+    <h1 class="h-title">Mis ordenes</h1>
+    <div class="table-responsive-xl mt-3">
+        <table class="table table-bordered table-hover text-center">
+            <thead class="thead-dark">
+                <tr>
+                    <th class="col-5">
+                        Orden
+                    </th>
+                    <th class="col-3">
+                        Fecha
+                    </th>
+                    <th class="col-2">
+                        Total
+                    </th>
+                    <th class="col-2">
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orden in ordenes %}
+                    <tr>
+                        <td class="align-middle">
+                            {{ orden.codigo }}
+                        </td>
+                        <td class="align-middle">
+                            {{ orden.fecha_de_orden|date:"d-m-Y" }}
+                        </td>
+                        <td class="align-middle">
+                           $ {{ orden.precio_total }}
+                        </td>
+                        <td class="align-middle">
+                            <a href="{{ orden.get_absolute_url }}">Ver detalle</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan='4'>
+                            Aún no has comprado ningún producto
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

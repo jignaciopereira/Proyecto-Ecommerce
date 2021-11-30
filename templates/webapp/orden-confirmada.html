@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titulo %}Orden confirmada{% endblock %}
+{% block contenido %}
+
+    <h1 class="text-center alert alert-success"><i class="bi bi-check-circle"></i> ORDEN CONFIRMADA</h1>
+    <h4 class="text-center">Gracias, {{ user.username }}. Tu orden ha sido confirmada.</h4>
+    <p class="text-center text-muted mb-5">Tu orden no ha sido enviada aún pero te enviaremos un email cuando lo hagamos.</p>
+    <div class="row">
+        <a href="{% url 'webapp:mis-ordenes' %}" class="btn btn-outline-dark mx-auto">VER MIS ORDENES</a>
+    </div>
+    
+{% endblock %}

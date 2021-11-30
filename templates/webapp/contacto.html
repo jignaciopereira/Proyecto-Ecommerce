@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block titulo %}Contacto{% endblock %}
+{% block contenido %}
+
+    {% if correo_enviado %}
+        <div class="row justify-content-center px-3">
+            <div class="alert alert-success alert-dismissible fade show col-sm-10 col-md-8 col-lg-6" role="alert">
+                Correo enviado con exito!
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    {% elif correo_enviado == False %}
+        <div class="row justify-content-center px-3">
+            <div class="alert alert-danger alert-dismissible fade show col-sm-10 col-md-8 col-lg-6" role="alert">
+                Tu correo no pudo ser enviado. Intentalo más tarde
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        </div>
+    {% endif %} 
+    <div class="row justify-content-center px-3 pb-3">
+        <div class="col-sm-10 col-md-8 col-lg-6 border rounded shadow p-3"> 
+            <h1 class="text-center pb-3">Envianos tu mensaje!</h1>
+            <form method="post">
+                {% csrf_token %}
+                <div class="fieldWrapper">
+                    {{ form.nombre }} 
+                </div>
+                <div class="fieldWrapper">
+                    <label for="{{ form.correo.id_for_label }}"></label>
+                    {{ form.correo }}
+                </div>
+                <div class="fieldWrapper">
+                    <label for="{{ form.asunto.id_for_label }}"></label>
+                    {{ form.asunto }}
+                </div>
+                <div class="fieldWrapper">
+                    <label for="{{ form.mensaje.id_for_label }}"></label>            
+                    {{ form.mensaje }}
+                </div>
+                <div class="row justify-content-center mt-3">
+                    <button type="submit" class="btn btn-dark">Enviar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

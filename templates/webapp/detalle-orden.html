@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block titulo %}Detalle de orden{% endblock %}
+{% block contenido %}
+
+    <h1 class="h-title">Orden: {{ orden.codigo }}</h1>
+    <h4 class="text-center font-weight-normal text-muted mb-3">Esta orden fue realizada el {{ orden.fecha_de_orden|date:"d-m-Y" }}</h4>
+    <div class="row">
+        <div class="col-lg-6 mb-3">
+            <h4 class="card-header text-center bg-dark text-white">Productos</h4>
+            {% for item in orden.get_orden_items %}
+                <div class="card text-center text-sm-left shadow p-2">
+                    <div class="row no-gutters">
+                        <div class="col-sm-5 text-center my-auto pb-3 pb-sm-0">
+                            <img src="{{ item.carrito_item.producto.imagen.url }}" class="imgcarrito" alt="{{ item.carrito_item.producto.titulo }}">
+                        </div>
+                        <div class="col-sm-7 my-auto">
+                            <div class="card-body p-0">
+                                <h5 class="card-title">
+                                    <a href="{{ item.get_absolute_url }}">{{ item.carrito_item.producto.titulo }}</a>
+                                </h5>
+                                <p class="card-text">Precio: ${{ item.get_precio_unidad }}</p>
+                                <p class="card-text">Cantidad: {{ item.get_cantidad }}</p>
+                                <p class="card-text">Total: ${{ item.get_precio_total }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="col-lg-6">
+            <div class="row">
+                <div class="col-md-6 col-lg-12 order-md-2 order-lg-1">
+                    <h4 class="card-header bg-dark text-white">Sumario</h4>
+                    <ul class="list-group shadow mb-3">
+                        {% for item in orden.get_orden_items %}
+                            <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                <div>
+                                    <h6 class="my-0">{{ item.carrito_item.producto.titulo }}<small class="text-muted"> x {{ item.get_cantidad }}</small></h6>
+                                </div>
+                                <span class="text-muted">${{ item.get_precio_total }}</span>
+                            </li>
+                        {% endfor %}    
+                        <li class="list-group-item d-flex justify-content-between bg-dark text-white">
+                            <span>Total (Pesos)</span>
+                            <strong>$ {{ orden.precio_total }}</strong>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6 col-lg-12 order-md-1 order-lg-2">
+                    <div class="card shadow mb-3">
+                        <div class="card-header bg-dark text-white">
+                            <h4 class="m-0">Datos de envío</h4>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">Nombre: {{ orden.direccion_envio.nombre }} {{ orden.direccion_envio.apellido }}</p>
+                            <p class="card-text">Dirección: {{ orden.direccion_envio.direccion }}</p>
+                            <p class="card-text">Télefono: {{ orden.direccion_envio.telefono }}</p>
+                            <p class="card-text">Código Postal: {{ orden.direccion_envio.codigo_postal }}</p>
+                            <p class="card-text">Provincia: {{ orden.direccion_envio.provincia }}</p>
+                            <p class="card-text">País: {{ orden.direccion_envio.pais }}</p>
+                        </div>      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

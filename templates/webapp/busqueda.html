@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block titulo %}Búsqueda "{{ consulta }}"{% endblock %}
+{% block contenido %}
+
+    {% if page_obj %}
+        <h1 class="h-title">Listado de productos "<em>{{ consulta }}</em>"</h1>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3">
+            {% for producto in page_obj %}
+                <div class="col mb-3">
+                    <div class="card my-card h-100 text-center shadow">
+                        <img src="{{ producto.imagen.url }}" class="card-img-top imgportada" alt="{{ producto.titulo }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ producto.titulo }}</h5>
+                            <p class="card-text d-flex justify-content-around">
+                                <span class=" my-auto">${{ producto.precio }}</span>
+                                {% if not user.is_staff %}
+                                    <a href="{% url 'webapp:agregar-al-carrito' producto.slug %}" class="btn btn-dark btn-sm">Agregar al carrito</a>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ producto.get_absolute_url }}" class="btn btn-outline-dark btn-sm">Ver detalles</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center mb-0 pb-3">  
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="btn btn-outline-dark btn-sm" href="?search={{ consulta }}&page={{ page_obj.previous_page_number }}">❮</a>
+                    </li>
+                {% endif %}
+                {% for page in page_obj.paginator.page_range %}
+                    {% if page == page_obj.number %}
+                        <li class="page-item">  
+                            <span class="btn btn-dark btn-sm" href="?search={{ consulta }}&page={{ page }}">{{ page }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="btn btn-outline-dark btn-sm" href="?search={{ consulta }}&page={{ page }}">{{ page }}</a>
+                        </li>
+                    {% endif %}   
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="btn btn-outline-dark btn-sm" href="?search={{ consulta }}&page={{ page_obj.next_page_number }}">❯</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% else %}
+        <h1 class="h-title">No se han encontrado productos que coincidan con "<em>{{ consulta }}</em>"</h1>
+    {% endif %}
+
+{% endblock %}
