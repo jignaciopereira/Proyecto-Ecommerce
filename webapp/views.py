@@ -1,35 +1,21 @@
-from django.http.response import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django.core import serializers
 from django.core.mail import EmailMessage
 from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.db.models import Sum
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.http import require_POST
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import PermissionRequiredMixin, AccessMixin
 from django.contrib.auth.models import Group
-from .models import CarritoItem, Marca, Producto, Carrito, Orden, OrdenItem, Categoria
+from .models import CarritoItem, Producto, Carrito, Orden, OrdenItem, Categoria
 from .forms import ProductoForm, ContactoForm, CustomUserCreationForm, CustomAuthenticationForm, DireccionEnvioForm
 
 
-'''
 def index(request, template_name='webapp/index.html'):
     productos = Producto.objects.order_by('-fecha_carga')[:10]
     context = {'productos': productos}
     return render(request, template_name, context)
-'''
-
-
-class ProductoListView(ListView):
-    template_name = 'webapp/index.html'
-    context_object_name = 'productos'
-
-    def get_queryset(self):
-        return Producto.objects.order_by('-fecha_carga')[:10]
 
 
 def buscar_producto(request, template_name='webapp/busqueda.html'):
@@ -45,7 +31,6 @@ def buscar_producto(request, template_name='webapp/busqueda.html'):
         return render(request, template_name)
 
 
-'''
 def filtrar_categoria(request, slug, template_name='webapp/productos-por-categoria.html'):
     categoria = Categoria.objects.get(slug=slug)
     productos = categoria.producto_set.all().order_by('modelo')
@@ -54,24 +39,8 @@ def filtrar_categoria(request, slug, template_name='webapp/productos-por-categor
     page_obj = paginator.get_page(page_number)
     context = {'page_obj': page_obj, 'categoria': categoria}
     return render(request, template_name, context)
-'''
 
 
-class ProductoCategoriaListView(ListView):
-    template_name = 'webapp/productos-por-categoria.html'
-    paginate_by = 6
-
-    def get_queryset(self):
-        self.categoria = get_object_or_404(Categoria, slug=self.kwargs.get('slug'))
-        return Producto.objects.filter(categoria=self.categoria).order_by('modelo')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['categoria'] = self.categoria
-        return context
-
-
-'''
 def detalle_producto(request, slug, template_name='webapp/detalle-producto.html'):
     if request.user.is_staff:
         return redirect(reverse('webapp:editar-producto', kwargs={'slug': slug}))
@@ -79,13 +48,6 @@ def detalle_producto(request, slug, template_name='webapp/detalle-producto.html'
         producto = get_object_or_404(Producto, slug=slug)
         context = {'producto': producto}
         return render(request, template_name, context)
-'''
-
-
-class ProductoDetailView(DetailView):
-    model = Producto
-    template_name = 'webapp/detalle-producto.html'
-
 
 
 @permission_required('webapp.add_producto', raise_exception=True)
@@ -102,26 +64,6 @@ def nuevo_producto(request, template_name='webapp/nuevo-producto.html'):
         form = ProductoForm()
     context = {'form': form}
     return render(request, template_name, context)
-
-
-
-class ProductoCreateView(PermissionRequiredMixin, AccessMixin, CreateView):
-    model = Producto
-    template_name = 'webapp/nuevo-producto.html'
-    form_class = ProductoForm
-    permission_required = 'webapp.add_producto'
-    raise_exception = True
-
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST, request.FILES)
-        if form.is_valid():
-            producto = form.save(commit=False)
-            extension = producto.imagen.name.split('.')[-1]
-            producto.imagen.name = f'{producto.titulo().replace(" ", "-").lower()}.{extension}'
-            producto.save()
-            return redirect('webapp:index')
-        return render(request, self.template_name, {'form': form})
-
 
 
 @permission_required('webapp.change_producto', raise_exception=True)
@@ -142,25 +84,6 @@ def editar_producto(request, slug, template_name='webapp/editar-producto.html'):
         form = ProductoForm(instance=producto)
     context = {'form': form}
     return render(request, template_name, context)
-
-
-
-class ProductoUpdateView(PermissionRequiredMixin, UpdateView):
-    model = Producto
-    template_name = 'webapp/editar-producto.html'
-    form_class = ProductoForm
-    permission_required = 'webapp.change_producto'
-
-    def post(self, request, *args, **kwargs):
-        if request.FILES:
-            nueva_imagen = request.FILES.get('imagen')
-            extension = nueva_imagen.name.split('.')[-1]
-            if extension == 'jpg' or extension == 'png':
-                self.object = self.get_object()
-                self.object.imagen.delete()
-                nueva_imagen.name = f'{self.object.titulo().replace(" ", "-").lower()}.{extension}'
-        return super().post(request, *args, **kwargs)
-
     
 
 @require_POST
@@ -170,18 +93,6 @@ def eliminar_producto(request, slug):
     if request.method == 'POST':
         producto.imagen.delete()
         producto.delete() 
-        return redirect('webapp:index')
-
-
-
-class ProductoDeleteView(PermissionRequiredMixin, DeleteView):
-    model = Producto
-    permission_required = 'webapp.delete_producto'
-
-    def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.imagen.delete()
-        self.object.delete()
         return redirect('webapp:index')
 
 
@@ -337,42 +248,17 @@ def orden_confirmada(request, template_name='webapp/orden-confirmada.html'):
     return render(request, template_name)
 
 
-'''
 @login_required
+@permission_required('webapp.view_orden', raise_exception=True)
 def mis_ordenes(request, template_name='webapp/mis-ordenes.html'):
     ordenes = Orden.objects.filter(usuario=request.user).order_by('-fecha_de_orden')
     context = {'ordenes': ordenes}
     return render(request, template_name, context)
-'''
 
 
-class OrdenListView(PermissionRequiredMixin, ListView):
-    context_object_name = 'ordenes'
-    template_name = 'webapp/mis-ordenes.html'
-    permission_required = 'webapp.view_orden'
-
-    def get_queryset(self):
-        return Orden.objects.filter(usuario=self.request.user).order_by('-fecha_de_orden')
-
-
-'''
 @login_required
+@permission_required('webapp.view_orden', raise_exception=True)
 def detalle_orden(request, codigo, template_name='webapp/detalle-orden.html'):
     orden = Orden.objects.get(codigo__exact=codigo)
     context = {'orden': orden}
     return render(request, template_name, context)
-'''
-
-
-class OrdenDetailView(PermissionRequiredMixin, DetailView):
-    template_name = 'webapp/detalle-orden.html'
-    permission_required = 'webapp.view_orden'
-
-    def get_object(self, queryset=None):
-        return Orden.objects.get(codigo=self.kwargs.get('codigo'))
-
-
-def marcas_json(request):
-    data = serializers.serialize('jsonl', Marca.objects.all())
-    print(data)
-    return HttpResponse(data)
